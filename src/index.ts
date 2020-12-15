@@ -1,32 +1,32 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import MongoClient from 'mongodb';
 import cors from 'cors';
+import config from 'config';
+
+import logger from './utils/logger';
 
 import userRoutes from './routes/user';
 import logInRoute from './routes/logIn';
 import filmRoutes from './routes/film';
 
 // Connection URL & Database Name
-const url = 'mongodb://localhost:27017';
-const dbName = 'myproject';
  
-mongoose.connect(`${url}/${dbName}`, {
+mongoose.connect(config.get('MONGODB_URI'), {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then( () => console.log(`Connected to ${dbName}`))
+  .then( () => logger.info('Connected to Database'))
   .catch(error => error);
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use("", logInRoute);
-app.use("/user", userRoutes);
-app.use("/films", filmRoutes);
+app.use('', logInRoute);
+app.use('/user', userRoutes);
+app.use('/films', filmRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
+    logger.info(`Server is listening on port ${PORT}`);
 });
