@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const SALT_WORK_FACTOR = 10;
 
@@ -8,6 +8,8 @@ export type UserDocument = mongoose.Document & {
     password: string;
     passwordResetToken: string;
     passwordResetExpires: Date;
+
+    favouriteFilms: Schema.Types.ObjectId[];
 
     facebook: string;
     tokens: AuthToken[];
@@ -37,10 +39,7 @@ const userSchema = new mongoose.Schema({
     passwordResetToken: String,
     passwordResetExpires: Date,
 
-    facebook: String,
-    twitter: String,
-    google: String,
-    tokens: Array,
+    favouriteFilms: [{ type: Schema.Types.ObjectId, ref: "Film"}],
 
     profile: {
         name: String,
