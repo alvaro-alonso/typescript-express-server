@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import { verifyToken } from '../middleware/auth';
 import { Film } from '../model/Film';
 import { User } from '../model/User';
+import logger from '../utils/logger';
 
 
 const router = express.Router();
@@ -23,8 +24,9 @@ router.get("", async (req: Request, res: Response) => {
         return res.send({ films: userFilms });
         
     } catch (err) {
+        logger.error(err);
         return res.status(500).send({ message: "Ops! something went wrong!" });
-    };
+    }
 });
 
 router.post("/add", async (req: Request, res: Response) => {
@@ -36,15 +38,19 @@ router.post("/add", async (req: Request, res: Response) => {
 
         const exists = await Film.exists({ name: filmData.name })
         if (exists) {
-            console.log('Film already exists');
             return res.status(403).send({ message: "Film already exists"});
         }
 
         film = new Film(filmData);
         await film.save();
+        logger.info(`new film created: ${film.name} (${film._id}) by ${userId}`);
     } catch (err) {
-        console.log(err);
-        return res.status(409).send({ message: "Wrong input for a film" });
+        logger.error(`film could not be created - ${err}`);
+        if (err.name == 'ValidationError') {
+            return res.status(409).send({ message: err });
+        } else {
+            return res.sendStatus(500);
+        }
     }
         
     try {
@@ -54,7 +60,7 @@ router.post("/add", async (req: Request, res: Response) => {
         return res.sendStatus(200);
  
     } catch (err) {
-        console.log(err);
+        logger.error(`film could not be added to user (${userId})- ${err}`);
         return res.sendStatus(500);
     }
 
