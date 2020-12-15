@@ -4,17 +4,18 @@ import * as jwt from "jsonwebtoken";
 import config from "../config/constants";
 import { UserDocument } from "../model/User";
 
-export const signToken = (userId: keyof UserDocument) => {
+export const signToken = (userId: keyof UserDocument) : string => {
     return jwt.sign({ userId }, config.jwtSecret, { expiresIn: "1h" });
 };
 
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = (req: Request, res: Response, next: NextFunction) : void => {
   //Get the jwt token from the head
   const bearer = <string>req.headers["authorization"];
   const token = bearer.split(' ')[1];
   
   if (!token) {
-    return res.status(403).send({ message: "No token provided!" });
+    res.status(403).send({ message: "No token provided!" });
+    return;
   }
 
   //Try to validate the token and get data
@@ -37,4 +38,5 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
   //Call the next middleware or controller
   next();
+  return;
 };

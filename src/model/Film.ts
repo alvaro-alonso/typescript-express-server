@@ -14,7 +14,7 @@ const filmSchema = new mongoose.Schema({
     genre: [{ type: String }],
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true }
 
-}, { timestamps: true });;
+}, { timestamps: true });
 
 
 
